@@ -72,7 +72,7 @@ function ProfileView({
               </div>
         <div className="flex-1 min-w-65">
           <div className="flex gap-2 flex-wrap mb-3">
-            {(org.tags ?? []).map((t) => <OrgTagChip key={t}>{t}</OrgTagChip>)}
+            {(org.tags ?? []).map((t) => <OrgTagChip key={t} tag={t}/>)}
           </div>
           <h1 className="font-display text-3xl font-semibold text-ink m-0 mb-3 leading-[1.15]">
             {org.name}
@@ -143,7 +143,7 @@ function Directory() {
   }
 
   return (
-    <div className="w-full max-w-260 pt-9 px-6 pb-20">
+    <div className="w-260 pt-9 px-6 pb-20">
       {activeOrg ? (
         <ProfileView
           org={activeOrg}
@@ -152,13 +152,8 @@ function Directory() {
         />
       ) : (
         <>
-          <h1
-            className="font-display text-ink font-semibold m-0"
-            style={{ fontSize: 'clamp(30px, 5vw, 44px)' }}
-          >
-            Organizations on the Hub
-          </h1>
-          <p className="font-display text-muted mt-2 mb-0">
+          <h1>Organizations on the Hub</h1>
+          <p className="lede">
             Browse member organizations of the Rideau Community Hub network.
           </p>
           <div className="flex flex-col gap-3 mt-6">

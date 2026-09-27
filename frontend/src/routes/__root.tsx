@@ -9,7 +9,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 
 function RootComponent() {
   return (
-    <div className="flex flex-col min-h-dvh w-dvw items-center">
+    <div className="flex flex-col min-h-100vh items-center">
       <Header /> 
       <Outlet />
     </div>

@@ -47,39 +47,45 @@ function Index() {
   // TODO: add routes for individual events, follow https://www.notanumber.in/blog/render-modal-on-a-route-with-the-parent-in-background-in-tanstack-router
 
   return (
-    <div className="flex flex-col items-start justify-start w-full max-w-260 pt-9 px-6 pb-20">
-      <h1 className="font-display text-ink font-semibold" style={{ fontSize: "clamp(30px, 5vw, 44px)" }}>What's happening at the Hub</h1>
-      <p className="font-display text-muted">
+    <div className="w-260 pt-9 px-6 pb-20 my-0 mx-auto">
+      <h1>What's happening at the Hub</h1>
+      <p className="lede">
         One shared place to discover and share events across the Rideau Community Hub network.
       </p>
 
       <div className="w-full flex centered justify-between items-center mt-6">
-        <div className="inline-flex bg-white border border-line p-1.25 rounded-full">
-          <button
-            onClick={() => setView('calendar')}
-            className={`text-[13px] rounded-full font-semibold px-4 py-1.75 capitalize transition-colors cursor-pointer border-0 ${view === 'calendar' ? `bg-accent text-white` : 'bg-transparent text-muted'}`}
-          >
-            Calendar
-          </button>
-          <button
-            onClick={() => setView('cards')}
-            className={`text-[13px] rounded-full font-semibold px-4 py-1.75 capitalize transition-colors cursor-pointer border-0 ${view === 'cards' ? `bg-accent text-white` : 'bg-transparent text-muted'}`}
-          >
-            Card grid
-          </button>
+        <div className="flex mt-5 gap-3 items-center"> 
+          {/* left side: view slider + create event button */}
+          <div className="inline-flex bg-white border border-line p-0.75 rounded-full">
+            <button
+              onClick={() => setView('calendar')}
+              className={`text-[11px] rounded-full px-4 py-1.75 transition-colors border-0 ${view === 'calendar' ? `bg-accent text-white` : 'bg-transparent text-muted'}`}
+            >
+              Calendar
+            </button>
+            <button
+              onClick={() => setView('cards')}
+              className={`text-[11px] rounded-full px-4 py-1.75 transition-colors border-0 ${view === 'cards' ? `bg-accent text-white` : 'bg-transparent text-muted'}`}
+            >
+              Card grid
+            </button>
+          </div>
+
+          {/* If signed in, display create event button */}
+          {user && (
+            <Button onClick={() => setModal("create_event")}>+ Create an event</Button>
+          )}
         </div>
 
-        { orgs && (
-          <FilterDropdown orgs={orgs ?? []} appliedIds={selectedOrgs} onApply={(ids) => {
-            setSelectedOrgs(ids);
-            toast("Organization filter applied.");
-          }} />
-        )}
-
-        {/* If signed in, display create event button */}
-        {user && (
-          <Button onClick={() => setModal("create_event")}>+ Create an event</Button>
-        )}
+        <div className="flex items-center gap-3 ml-auto">
+          {/* right side */}
+          { orgs && (
+            <FilterDropdown orgs={orgs ?? []} appliedIds={selectedOrgs} onApply={(ids) => {
+              setSelectedOrgs(ids);
+              toast("Organization filter applied.");
+            }} />
+          )}
+        </div>
       </div>
 
       {/* MAIN VIEW PANEL: CALENDAR OR CARDS  */}

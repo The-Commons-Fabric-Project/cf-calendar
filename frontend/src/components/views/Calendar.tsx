@@ -53,9 +53,9 @@ export function CalendarView({ events, visibleOrgs, showLegend, onSelect, rangeS
   const arrowButtonStyles = "cf-press font-semibold text-sm px-3 py-1.5 rounded-md cursor-pointer border border-line leading-tight tracking-tight bg-transparent text-ink";
 
   return (
-    <div className="bg-white border border-line rounded-2xl p-4.5">
-      <div className="flex justify-between items-center mb-3.5">
-        <h3 className="font-display text-sm font-bold text-ink m-0">
+    <div className="card p-4.5">
+      <div className="flex justify-between items-center mb-3">
+        <h3 className="uppercase text-[14px] font-bold text-ink m-0">
           {format(cursor, 'MMMM yyyy')}
         </h3>
         <div className="flex gap-2">
