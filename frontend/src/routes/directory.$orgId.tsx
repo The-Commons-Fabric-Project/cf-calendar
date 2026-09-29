@@ -32,17 +32,7 @@ function makeOrgTagChip(k: string, tag: OrgTag) {
   return <Tag key={k} variant={colorKey(idx)}>{tag}</Tag>
 }
 
-function ProfileView(
-//   {
-//   org,
-//   onBack,
-//   onSelectEvent,
-// }: {
-//   org: Org
-//   onBack: () => void
-//   onSelectEvent: (e: Event) => void
-// }
-) {
+function ProfileView() {
   const org = Route.useLoaderData() as Org;
   // Filtered by the server rather than by matching display names. The events
   // table has no organization name to match on - it has an id - and two
@@ -56,13 +46,6 @@ function ProfileView(
   return (
     <>
     <div style={{ animation: 'cf-fade .3s ease' }}>
-      {/* <Link to={'/directory'}
-        className="bg-transparent border-0 text-primary font-semibold text-[14px] cursor-pointer p-0 mb-4.5 block font-body"
-        style={{ transition: 'color .15s ease' }}
-      >
-        ‹ Back to directory
-      </Link> */}
-
       {/* Org header card */}
       <div className="bg-white border border-line rounded-2xl p-7 mb-6 flex gap-6 items-start flex-wrap">
         <div
@@ -121,6 +104,8 @@ function ProfileView(
         </div>
       )}
     </div>
+
+    {/* event detail modal belongs to the org profile route now */}
        {selectedEvent && (
         <EventDetailModal
           event={selectedEvent}

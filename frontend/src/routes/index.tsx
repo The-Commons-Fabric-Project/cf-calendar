@@ -1,20 +1,34 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
+import { useAuth } from '../hooks/useAuth'
+
+import type { Org } from '../api/organizations';
+import type { Event } from '../api/events';
+import { useEvents } from '../hooks/useEvents'
+import { useOrgLookup, organizationsQueryOptions as orgList } from '../hooks/useOrganizations'
+import { useModal, useToast } from '../hooks/useOverlayContext';
 
 import Button from '../components/_controls/Button';
 import EventCardGrid from '../components/views/EventCardGrid'
 import { CalendarView } from '../components/views/Calendar'
-import { useAuth } from '../hooks/useAuth'
-import { useEvents } from '../hooks/useEvents'
-import { useOrganizations, useOrgLookup } from '../hooks/useOrganizations'
-import { useModal, useToast } from '../hooks/useOverlayContext';
+
 import CreateEventModal from '../components/modals/CreateEventModal';
 import EventDetailModal from '../components/modals/EventDetailModal';
 import { monthBounds, toDateKey } from '../utils/datetime';
 import type { DateKey } from '../utils/types/dates';
-import type { Event } from '../api/events';
 import type { EventsView } from '../utils/types/views';
 import { FilterDropdown } from '../components/nav/FilterDropdown';
+
+
+export const Route = createFileRoute('/')({
+  component: Index,
+  loader: async ({ context }) => {
+    const { queryClient: qc } = context;
+    const orgs = await qc.ensureQueryData(orgList()) as Org[];
+    return orgs;
+  }
+})
+
 
 function Index() {
   const [view, setView] = useState<EventsView>('calendar')
@@ -26,9 +40,9 @@ function Index() {
     ? { startDate: gridStart, endDate: gridEnd }
     : { startDate: calendarWindow.start, endDate: calendarWindow.end };
 
-  const { data: events, isLoading, error } = useEvents(activeWindow);
-  const { data: orgs } = useOrganizations();
-  
+  const { data: allEvents, isLoading, error } = useEvents(activeWindow);
+  const orgs = Route.useLoaderData();
+
   const [selectedOrgs, setSelectedOrgs] = useState<number[]>(orgs ? orgs.map(o => o.id) : []);  
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
@@ -37,19 +51,20 @@ function Index() {
   const { modal, setModal } = useModal();
   const { toast } = useToast();
 
-  /** organizations with events currently visible on calendar 
-   * 
-   * TODO: change to useMemo
-  */
-  const visibleOrgs = events ? [...new Set(events?.map(e => e.organizationId))].map(o => {
-    const name = orgName(o) ? orgName(o) as string : '';
-    return { id: o, name: name}
-  }) : [];
+  const events = useMemo(
+    () => {return ( selectedOrgs.length === orgs.length ?
+      allEvents :
+      allEvents?.filter((ev) => selectedOrgs.includes(ev.organizationId))
+    )},
+    [allEvents, orgs, selectedOrgs]
+  )
+
 
   // TODO: add routes for individual events, follow https://www.notanumber.in/blog/render-modal-on-a-route-with-the-parent-in-background-in-tanstack-router
 
   return (
-    <div className="w-260 pt-9 px-6 pb-20 my-0 mx-auto">
+    <div className="w-260 pt-9 px-6 pb-20 my-0 mx-auto"
+    style={{ animation: 'cf-fade .3s ease' }}>
       <h1>What's happening at the Hub</h1>
       <p className="lede">
         One shared place to discover and share events across the Rideau Community Hub network.
@@ -107,7 +122,7 @@ function Index() {
         ) : (
           <CalendarView
             events={events ?? []}
-            visibleOrgs={visibleOrgs}
+            orgs={orgs ?? []}
             span={"month"}
             onSelect={setSelectedEvent}
             rangeStart={calendarWindow.start}
@@ -141,7 +156,3 @@ function Index() {
     </div>
   )
 }
-
-export const Route = createFileRoute('/')({
-  component: Index,
-})

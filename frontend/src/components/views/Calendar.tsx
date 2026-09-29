@@ -7,7 +7,7 @@
  * harder to theme. Revisit if we need Google Calendar/Outlook integration.
  */
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { addMonths, format, startOfMonth, subMonths } from 'date-fns';
 import type { Event } from '../../api/events';
 import type { Org } from '../../api/organizations';
@@ -19,7 +19,7 @@ import { LegendBar } from '../nav/LegendBar';
 
 type CalendarViewProps = {
   events: Event[];
-  visibleOrgs: Pick<Org, "id" | "name">[];
+  orgs: Org[];
   /** timespan visible on the calendar -> which grid is visible */
   span: CalendarView; // day | week | month
   onSelect: (event: Event) => void;
@@ -34,11 +34,20 @@ type CalendarViewProps = {
   onWindowChange: (start: DateKey, end: DateKey) => void;
 };
 
-export function CalendarView({ events, visibleOrgs, showLegend, onSelect, rangeStart, onWindowChange }: CalendarViewProps) {
+export function CalendarView({ events, orgs, showLegend, onSelect, rangeStart, onWindowChange }: CalendarViewProps) {
   // Seeded from the current window, falling back to today. The month decides which
   // data is fetched, so it cannot be derived from the events.
   
   const [cursor, setCursor] = useState(() => (rangeStart ? fromDateKey(rangeStart) : new Date()));
+
+  
+  /** organizations with events currently visible on calendar */
+  const visibleOrgs = useMemo(
+    () => {
+      const eventHosts = new Set(events?.map(e => e.organizationId));
+      return orgs.filter((o) => eventHosts.has(o.id));
+    }, [events, orgs]
+  )
 
   // Moving the cursor also moves the fetch window.
   const goToMonth = (next: Date) => {
