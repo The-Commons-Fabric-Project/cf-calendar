@@ -10,14 +10,14 @@ type OrgCardProps = {
 }
 
 /** Current design doesn't use organization tags, so this is a placeholder method for styling them/indexing their color */
-export function OrgTagChip({ tag }: { tag: OrgTag }) {
+function makeOrgTagChip(k: string, tag: OrgTag) {
   const idx = tag.charCodeAt(0)+tag.charCodeAt(1);
-  return ( <Tag key={tag} variant={colorKey(idx)}>{tag}</Tag>
-  )
+  return <Tag key={k} variant={colorKey(idx)}>{tag}</Tag>
 }
 
 export default function OrgCard({ org, onClick, idx }: OrgCardProps) {
   const color: ColorVariantClasses = classesForID(org.id);
+  const inits = orgInitials(org.name);
   return (
     <div
       onClick={onClick}
@@ -29,11 +29,11 @@ export default function OrgCard({ org, onClick, idx }: OrgCardProps) {
       <div
         className={`rounded-md size-15 shrink-0 flex items-center justify-center text-base font-bold ${color.plate}`}
       >
-        {orgInitials(org.name)}
+        {inits}
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex gap-2 flex-wrap mb-2.5">
-          {(org.tags ?? []).map((t) => <OrgTagChip tag={t}/>)}
+          {(org.tags ?? []).map((t, i) => makeOrgTagChip(`${inits}-${i}`,t))}
         </div>
         <h3 className="font-sans text-lg font-bold text-gray-900 mb-1 leading-tight">{org.name}</h3>
         <p className="text-sm text-gray-500 leading-relaxed">{org.blurb}</p>

@@ -17,12 +17,7 @@ import type { EventsView } from '../utils/types/views';
 import { FilterDropdown } from '../components/nav/FilterDropdown';
 
 function Index() {
-  const { data: orgs } = useOrganizations();
-  const [selectedOrgs, setSelectedOrgs] = useState<number[]>(orgs ? orgs.map(o => o.id) : []);
-
   const [view, setView] = useState<EventsView>('calendar')
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-
   const [gridStart, setGridStart] = useState<DateKey>("");
   const [gridEnd, setGridEnd] = useState<DateKey>("");
   const [calendarWindow, setCalendarWindow] = useState(() => monthBounds(new Date()));
@@ -32,13 +27,20 @@ function Index() {
     : { startDate: calendarWindow.start, endDate: calendarWindow.end };
 
   const { data: events, isLoading, error } = useEvents(activeWindow);
+  const { data: orgs } = useOrganizations();
+  
+  const [selectedOrgs, setSelectedOrgs] = useState<number[]>(orgs ? orgs.map(o => o.id) : []);  
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
   const orgName = useOrgLookup();
   const { user } = useAuth();
   const { modal, setModal } = useModal();
   const { toast } = useToast();
 
-  /** organizations with events currently visible on calendar */
+  /** organizations with events currently visible on calendar 
+   * 
+   * TODO: change to useMemo
+  */
   const visibleOrgs = events ? [...new Set(events?.map(e => e.organizationId))].map(o => {
     const name = orgName(o) ? orgName(o) as string : '';
     return { id: o, name: name}

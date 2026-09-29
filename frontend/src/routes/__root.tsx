@@ -4,7 +4,7 @@ import Header from '../components/nav/Header'
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   component: RootComponent,
-  loader: ({context}) => context.auth
+  // loader: ({context}) => context.auth
 })
 
 function RootComponent() {

@@ -74,8 +74,11 @@ export function CalendarView({ events, visibleOrgs, showLegend, onSelect, rangeS
         </div>
       </div>
 
-      {/* TODO: add day/week views */}
-      <MonthGrid year={cursor.getFullYear()} month={cursor.getMonth()} events={events} maxPerDay={maxPerDay} onSelect={onSelect} />
+      <div className="overflow-y-auto overflow-x-hidden h-124">
+        {/* TODO: add day/week views */}
+        <MonthGrid year={cursor.getFullYear()} month={cursor.getMonth()} events={events} maxPerDay={maxPerDay} onSelect={onSelect} />
+      </div>
+      
 
       {/* OrgLegend below */}
       {showLegend && (

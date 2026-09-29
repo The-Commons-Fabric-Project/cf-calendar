@@ -1,7 +1,5 @@
-import { useEffect, useState } from 'react'
 import { Link, useRouterState } from '@tanstack/react-router'
 
-import CommonsFabricLogo from '../../assets/CommonsFabricLogo'
 import Button from '../_controls/Button';
 
 import LoginModal from '../modals/LoginModal';
@@ -21,23 +19,16 @@ import Toast from '../modals/Toast';
  * on the RCH logo asset.
  */
 export default function Header() {
-  const [hidden, setHidden] = useState(false);
   const session = useAuth();
-  const { location,  } = useRouterState();
+  const { location, } = useRouterState();
   const path = location.pathname;
   
   const { modal, setModal } = useModal();
   const {toastMsg} = useToast();
 
-  useEffect(() => {
-    const handleScroll = () => setHidden(window.scrollY > 200)
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
   const navClass = (active: boolean) =>
-    `no-underline border-b-2 cursor-pointer font-sans text-[14.5px] font-semibold px-0 py-1 bg-transparent transition-colors ${
-      active ? 'border-primary text-ink' : 'border-transparent text-muted'
+    `no-underline border-b-2 cursor-pointer font-sans type-item px-0 pt-1 pb-1.5 bg-transparent transition-colors ${
+      active ? 'border-accent text-ink' : 'border-transparent text-muted'
     }`
 
   const handleLogin = () => { setModal("login"); }
@@ -60,28 +51,27 @@ export default function Header() {
 
   return (
     <>
-    <header className={`sticky top-0 z-50 w-full border-b border-line bg-paper/80 backdrop-blur-[10px] transition-transform duration-300 ${hidden ? '-translate-y-full' : 'translate-y-0'}`}>
+    <header className={`sticky top-0 z-50 w-full border-b border-line bg-surface`}>
       <div className="w-full flex gap-0.5">
         {COLOR_ORDER.map((c) => (
           <span key={c} className={`flex-1 h-0.75 ${COLOR_CLASSES[c].fill}`}/>
         ))}
       </div>
 
-      <div className="max-w-260 mx-auto px-6 py-3 flex items-center justify-between gap-4">
+      <div className="max-w-260 my-0 mx-auto px-6 py-3 flex items-center justify-between gap-4">
 
         {/* Logo */}
-        <Link to="/" className="no-underline flex items-center gap-2.5 p-0">
-          <CommonsFabricLogo />
-          <span className="text-left leading-[1.1]">
-            <span className="block font-display text-[16px] font-semibold text-ink">Commons Fabric</span>
-            <span className="block text-[11px] text-muted font-medium">Community Calendar</span>
-          </span>
+        <Link to="/" className="leading-tight p-0 text-left no-underline">
+          <span className="block type-title text-[15px]">Commons Fabric</span>
+          <span className="block type-label text-[9.5px]">Community Calendar</span>
         </Link>
 
         {/* Nav */}
         <nav className="flex gap-5.5 ml-auto mr-2">
           <Link to="/" className={navClass(path === '/')}>Events</Link>
           <Link to="/directory" className={navClass(path === '/directory')}>Directory</Link>
+          {/* TODO: about page */}
+          {/* <Link to="/about" */}
         </nav>
 
         {/* Auth buttons */}
