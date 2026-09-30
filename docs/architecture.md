@@ -1,15 +1,7 @@
 # Architecture
 
-```mermaid
-architecture-beta
-    group api(cloud)[API]
-
-    service db(database)[Database] in api
-    service disk1(disk)[Storage] in api
-    service disk2(disk)[Storage] in api
-    service server(server)[Server] in api
-
-    db:L -- R:server
-    disk1:T -- B:server
-    disk2:T -- B:db
-```
+<picture>
+ <source media="(prefers-color-scheme: dark)" srcset="assets/architecture.svg">
+ <source media="(prefers-color-scheme: light)" srcset="assets/architecture.svg">
+ <img alt="YOUR-ALT-TEXT" src="YOUR-DEFAULT-IMAGE">
+</picture>
