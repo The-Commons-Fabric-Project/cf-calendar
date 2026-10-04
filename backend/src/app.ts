@@ -5,6 +5,7 @@ import { problemDetails } from './middleware/problemDetails.js';
 import { eventsRouter } from './endpoints/events.js';
 import { organizationsRouter } from './endpoints/organizations.js';
 import { authRouter } from './endpoints/auth.js';
+import { calendarRouter } from './endpoints/calendar.js';
 import path from 'node:path'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
@@ -48,6 +49,7 @@ export function createApp() {
   app.use('/v1', authRouter);
   app.use('/v1', eventsRouter);
   app.use('/v1', organizationsRouter);
+  app.use('/v1', calendarRouter);
 
   if (!isDevelopment) {
     // Serves the built vite project. After the routers, so a real route wins.

@@ -17,6 +17,7 @@ backend/                        — Express API server, source of truth for the 
 │   ├── db/client.ts            — Shared Prisma client instance.
 │   ├── endpoints/               — One router per resource, mounted under /v1.
 │   │   ├── auth.ts              — Signup/login/logout, session cookie issuance.
+│   │   ├── calendar.ts          — iCalendar (.ics) export: per-event download and subscription feed.
 │   │   ├── events.ts            — Event CRUD/listing.
 │   │   └── organizations.ts     — Organization CRUD/listing.
 │   ├── middleware/
@@ -27,6 +28,7 @@ backend/                        — Express API server, source of truth for the 
 │   ├── utils/
 │   │   ├── constraints.ts       — Shared validation constraints.
 │   │   ├── encryption.ts        — Password hashing (argon2id).
+│   │   ├── ical.ts              — Serializes events as RFC 5545 VCALENDAR (via ical-generator).
 │   │   ├── orgTags.ts           — ORG_TAGS enum values (SQLite has no enum type; mirrors schema.dbml).
 │   │   ├── problems.ts          — HttpProblem class and factory helpers (notFound, badRequest, etc).
 │   │   └── userSessions.ts      — Session token signing/verification, cookie name.
@@ -38,7 +40,8 @@ backend/                        — Express API server, source of truth for the 
 │   ├── schema.prisma            — DB schema (SQLite-specific translation of docs/db/schema.dbml).
 │   ├── migrations/               — One directory per migration; migration_lock.toml pins the provider.
 │   └── seed/                     — Dev seed data (dev-organizations-seed.json) and seed.ts runner.
-├── test/                         — api-contract.test.ts (openapi conformance), schema-sync.test.ts.
+├── test/                         — api-contract.test.ts (openapi conformance), ical.test.ts (serializer),
+│                                   schema-sync.test.ts.
 └── scripts/copy-openapi.mjs      — Copies openapi.yaml into dist/ at build time.
 
 frontend/                       — React SPA (Vite, TanStack Router/Query, Tailwind v4).

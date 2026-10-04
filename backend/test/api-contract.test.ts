@@ -82,6 +82,14 @@ test('a path parameter of the wrong type is rejected', async () => {
   assert.match(String(body.detail), /eventId/);
 });
 
+test('the calendar routes validate their parameters', async () => {
+  const single = await expectProblem(await fetch(`${base}/v1/events/abc/calendar.ics`), 400);
+  assert.match(String(single.detail), /eventId/);
+
+  const feed = await expectProblem(await fetch(`${base}/v1/calendar.ics?organizationId=abc`), 400);
+  assert.match(String(feed.detail), /organizationId/);
+});
+
 test('a server-assigned field cannot be smuggled into a create', async () => {
   // If unevaluatedProperties regresses, a client can choose who owns its event.
   const response = await fetch(`${base}/v1/events`, json({ ...validEvent, ownerId: 9 }, session));

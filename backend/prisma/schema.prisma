@@ -26,6 +26,7 @@ model User {
 
 model Event {
   id               Int      @id @default(autoincrement())
+  uid              String   @unique @default(uuid(4)) // iCalendar UID - random per RFC 7986, never derived from id or host
   title            String
   ownerId          Int      @map("owner_id")
   startsAt         DateTime @map("starts_at")

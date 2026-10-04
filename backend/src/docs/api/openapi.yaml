@@ -32,6 +32,8 @@ tags:
     description: The organizations participating in the calendar.
   - name: Auth
     description: Account creation and authentication.
+  - name: Calendar
+    description: Events as iCalendar (RFC 5545), for calendar apps to import or subscribe to.
 
 paths:
   /auth/create-user:
@@ -246,6 +248,61 @@ paths:
         '404': { $ref: '#/components/responses/Problem' }
         default: { $ref: '#/components/responses/Problem' }
 
+  /events/{eventId}/calendar.ics:
+    parameters:
+      - $ref: '#/components/parameters/EventId'
+    get:
+      security: [] #public
+      operationId: getEventCalendar
+      tags: [Calendar]
+      summary: Download a single event as iCalendar
+      description: >-
+        The event as an RFC 5545 `VCALENDAR` holding one `VEVENT`, served as an
+        attachment for "add to calendar". Its `UID` is the same one the
+        subscription feed uses, so importing it and subscribing do not double up
+        in clients that de-duplicate on `UID`.
+      responses:
+        '200':
+          description: The event as an iCalendar file
+          headers:
+            Content-Disposition:
+              description: '`attachment`, with a filename derived from the title.'
+              schema: { type: string }
+          content:
+            text/calendar:
+              schema: { $ref: '#/components/schemas/ICalendar' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '404': { $ref: '#/components/responses/Problem' }
+        default: { $ref: '#/components/responses/Problem' }
+
+  /calendar.ics:
+    get:
+      security: [] #public
+      operationId: getCalendarFeed
+      tags: [Calendar]
+      summary: Subscribe to events as an iCalendar feed
+      description: >-
+        A subscribable `VCALENDAR` of every event that ended within the last 30
+        days or has yet to end, optionally narrowed to one organization. The
+        lookback keeps an event in subscribers' calendars while it is running and
+        after it has passed; the window is fixed rather than a parameter, because
+        a subscription URL is polled unattended.
+
+
+        Answers 404 when `organizationId` names no organization, so a mistyped
+        subscription fails loudly instead of syncing an empty calendar forever.
+      parameters:
+        - $ref: '#/components/parameters/OrganizationIdFilter'
+      responses:
+        '200':
+          description: The feed
+          content:
+            text/calendar:
+              schema: { $ref: '#/components/schemas/ICalendar' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '404': { $ref: '#/components/responses/Problem' }
+        default: { $ref: '#/components/responses/Problem' }
+
   /organizations:
     get:
       security: [] #public
@@ -363,6 +420,14 @@ components:
       type: integer
       minimum: 1
       description: Identifier of an organization (an `organizations` row).
+
+    ICalendar:
+      type: string
+      description: >-
+        An RFC 5545 `VCALENDAR` with no `METHOD` - a snapshot, not a scheduling
+        message. Times are UTC. Each `VEVENT`'s `UID` is a random v4 UUID
+        (RFC 7986 section 5.3) stored with the event and fixed for its lifetime;
+        it is unrelated to the event's `id`.
 
     UserId:
       type: integer
