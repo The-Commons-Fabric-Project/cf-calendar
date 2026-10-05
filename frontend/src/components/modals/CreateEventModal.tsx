@@ -1,8 +1,13 @@
 /** Create event modal (Org Admin only). */
 
 import { useState } from "react";
+import { useToast } from "../../hooks/useOverlayContext";
+import { useCreateEvent } from "../../hooks/useEvents";
+import { ApiError } from "../../api/client";
+import type { Event, EventCreate } from "../../api/events";
+import type { User } from "../../api/auth";
 
-import Modal, { ModalHeader } from "./Modal";
+import Modal from "./Modal";
 import Field from "../_controls/Field";
 import Button from "../_controls/Button";
 import Toggle from "../_controls/Toggle";
@@ -10,11 +15,7 @@ import Summary from "../_chips/Summary";
 
 import { EMAIL_RE } from "../../utils/stringcheck";
 import { fmtTime, fmtPlainDate, fromDateAndTime, localDateTime } from "../../utils/datetime";
-import { useToast } from "../../hooks/useOverlayContext";
-import { useCreateEvent } from "../../hooks/useEvents";
-import { ApiError } from "../../api/client";
-import type { Event, EventCreate } from "../../api/events";
-import type { User } from "../../api/auth";
+import { useOrgLookup } from "../../hooks/useOrganizations";
 
 /**
  * What this form collects - deliberately not derived from `Event`. The form takes
@@ -71,6 +72,7 @@ export default function CreateEventModal({
   const [errors, setErrors] = useState<EventFormErrors>({});
   const { toast } = useToast();
   const createEvent = useCreateEvent();
+  const org = useOrgLookup();
 
   /**
    * Maps the form onto the API's `EventCreate` and publishes it. Untouched optional
@@ -109,8 +111,8 @@ export default function CreateEventModal({
   const validate = () => {
     const e: EventFormErrors = {};
     if (!form.title?.trim()) e.title = "Title is required.";
-    if (!form.startDate) e.startDate = "Event startDate is required.";
-    if (!form.startTime) e.startTime = "Event startTime is required.";
+    if (!form.startDate) e.startDate = "Event start date is required.";
+    if (!form.startTime) e.startTime = "Event start time is required.";
     if (!form.location?.trim()) e.location = "Location is required.";
     if (form.registrationRequired && !form.registrationLink?.trim()) e.registrationLink = "Add the link people register through.";
     if (form.volunteersNeeded && !EMAIL_RE.test(form.volunteerContact)) e.volunteerContact = "Add a valid contact email for volunteers.";
@@ -125,33 +127,43 @@ export default function CreateEventModal({
     : null;
   const whenSummary = startsAt ? `${fmtPlainDate(startsAt)} · ${fmtTime(startsAt)}` : "";
 
-  const inputStyle = (err: EventFormErrors[keyof EventFormErrors]) => `w-full px-[11px] py-[9px] rounded-md text-sm font-sans outline-none ${err ? 'border border-red-500' : 'border border-slate-300'} bg-white text-slate-900`;
+  const inputStyle = (err: EventFormErrors[keyof EventFormErrors]) => `w-full px-2.5 py-2 rounded-md text-sm font-sans outline-none border ${err ? 'border-danger' : 'border-line'} bg-white text-ink`;
 
   return (
-    <Modal onClose={onClose} width={500}>
-      {/* TODO: name the organization, not the person - resolve it with useOrgLookup. */}
-      <ModalHeader title="Create event" onClose={onClose}
-        subtitle={`Hosting as ${session.fullname}`} />
-      <div className="px-4.5 py-[24px]">
+    <Modal onClose={onClose} width={500} title="Create event" subtitle={`Hosting as ${org(session.organizationId)}`}>
+      <div className="px-4.5 py-6">
         {step === 1 ? (
           <>
             <Field label="Title" error={errors.title}>
               <input className={inputStyle(errors.title)} value={form.title}
                 onChange={(e) => setF({ title: e.target.value })} placeholder="Event title" />
             </Field>
-            <div className="flex gap-3">
-              <div className="flex-1">
-                <Field label="Event startDate" error={errors.startDate}>
-                  <input type="startDate" className={inputStyle(errors.startDate)} value={form.startDate}
-                    onChange={(e) => setF({ startDate: e.target.value })} />
-                </Field>
-              </div>
-              <div className="flex-1">
-                <Field label="Event startTime" error={errors.startTime}>
-                  <input type="startTime" className={inputStyle(errors.startTime)} value={form.startTime}
-                    onChange={(e) => setF({ startTime: e.target.value })} />
-                </Field>
-              </div>
+
+            <div className="border border-line rounded-md py-3 px-3.25 mb-3.5 bg-field grid gap-x-2.5 gap-y-2">
+              <Field inline={true} label="starts" error={errors.startDate} className="grid gap-x-2.5 gap-y-2">
+                <input type="date" 
+                  className={`${inputStyle(errors.startDate)} col-2`} 
+                  value={form.startDate}
+                  onChange={(e) => setF({ startDate: e.target.value })} 
+                />
+                <input type="time"
+                  className={`${inputStyle(errors.startTime)} col-3`}
+                  value={form.startTime}
+                  onChange={(e) => setF({ startTime: e.target.value})}
+                />
+              </Field>
+              <Field inline={true} label="Ends" error={errors.startTime} className="grid gap-x-2.5 gap-y-2">
+                <input type="date" 
+                  className={`${inputStyle(errors.endDate)} col-2`} 
+                  value={form.endDate}
+                  onChange={(e) => setF({ endDate: e.target.value })} 
+                />
+                <input type="time"
+                  className={`${inputStyle(errors.endTime)} col-3`}
+                  value={form.endTime}
+                  onChange={(e) => setF({ endTime: e.target.value})}
+                />
+              </Field>
             </div>
             <Field label="Location" error={errors.location}>
               <input className={inputStyle(errors.location)} value={form.location}
@@ -200,7 +212,7 @@ export default function CreateEventModal({
             >Is this information correct?</p>
             <div className="flex gap-2.5"
             >
-              <Button variant="ghost" className="flex-1" onClick={() => setStep(1)}
+              <Button variant="secondary" className="flex-1" onClick={() => setStep(1)}
                 disabled={createEvent.isPending}>No, edit</Button>
               <Button className="flex-1" onClick={publish} disabled={createEvent.isPending}>
                 {createEvent.isPending ? "Publishing…" : "Yes, publish"}

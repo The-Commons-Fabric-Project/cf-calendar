@@ -6,7 +6,6 @@ import Modal, { CloseButton } from './Modal';
 import Button from '../_controls/Button';
 import { useToast } from '../../hooks/useOverlayContext';
 import { accentStops, colorKey } from '../../utils/palette';
-import { useOrgLookup } from '../../hooks/useOrganizations';
 
 type DetailRowProps = {
   icon: ReturnType<typeof Icon>,
@@ -46,10 +45,6 @@ export default function EventDetailModal({
         ))}
       </div>
       <CloseButton onClose={onClose}/>
-      {/* <ModalHeader 
-        title={event.title} 
-        onClose={onClose}
-        subtitle={orgName} /> */}
       <div className="pt-5.5 pr-11 pb-0 pl-[24px]">
         <h2 className="font-bold text-ink m-0 leading-tight">{event.title}</h2>
         <p className="text-[11px] font-bold mt-1.5 tracking-[0.04em] uppercase"
