@@ -125,7 +125,14 @@ export default function CreateEventModal({
   const startsAt = form.startDate && form.startTime
     ? localDateTime(form.startDate, form.startTime)
     : null;
-  const whenSummary = startsAt ? `${fmtPlainDate(startsAt)} · ${fmtTime(startsAt)}` : "";
+  const endsAt = form.endDate && form.endTime ? localDateTime(form.endDate, form.endTime) : null;
+
+  const whenSummary = startsAt ? 
+    `${fmtPlainDate(startsAt)} · ${fmtTime(startsAt)}${ endsAt ? 
+      `${form.endDate !== form.startDate ? 
+        ` - ${fmtPlainDate(endsAt)} · ` 
+        : " - "}` + fmtTime(endsAt)
+      : ""}` : "";
 
   const inputStyle = (err: EventFormErrors[keyof EventFormErrors]) => `w-full px-2.5 py-2 rounded-md text-sm font-sans outline-none border ${err ? 'border-danger' : 'border-line'} bg-white text-ink`;
 
@@ -164,7 +171,9 @@ export default function CreateEventModal({
                   onChange={(e) => setF({ endTime: e.target.value})}
                 />
               </Field>
+              {/* TODO: add recurrence here */}
             </div>
+            
             <Field label="Location" error={errors.location}>
               <input className={inputStyle(errors.location)} value={form.location}
                 onChange={(e) => setF({ location: e.target.value })} placeholder="e.g. RCH Room 2" />
@@ -199,12 +208,12 @@ export default function CreateEventModal({
           </>
         ) : (
           <>
-            <div className="bg-paper border border-line rounded-sm p-[16px] mb-[16px]"
+            <div className="bg-surface-alt border border-line rounded-md p-4 mb-4 flex flex-col"
             >
               <Summary label="Title" value={form.title} />
               <Summary label="When" value={whenSummary} />
               <Summary label="Where" value={form.location} />
-              <Summary label="Host" value={session.fullname} />
+              <Summary label="Host" value={org(session.organizationId) ?? ""} />
               <Summary label="Registration" value={form.registrationRequired ? form.registrationLink : "Not required"} />
               <Summary label="Volunteers" value={form.volunteersNeeded ? form.volunteerContact : "Not recruiting"} last />
             </div>
