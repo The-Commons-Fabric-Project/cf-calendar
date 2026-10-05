@@ -1,5 +1,9 @@
-// This is the Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// Prisma translation of src/docs/db/schema.dbml, the conceptual source of truth.
+// Differences from the DBML:
+//   - ids are Int (serial) rather than bigint, so they serialize as JSON numbers.
+//   - org_tags is text constrained by a CHECK, not a Postgres enum, so adding a
+//     tag stays a CHECK change; src/utils/orgTags.ts mirrors the list.
+//   - CHECK constraints cannot be expressed here; they live in the migration SQL.
 
 generator client {
   provider = "prisma-client"
@@ -7,7 +11,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 model User {
@@ -16,7 +20,7 @@ model User {
   email          String       @unique
   passwordHash   String       @map("password_hash") // argon2id PHC string - the salt and params are encoded in it
   organizationId Int          @map("organization_id")
-  createdAt      DateTime     @default(now()) @map("created_at")
+  createdAt      DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
 
   organization   Organization @relation(fields: [organizationId], references: [id])
   events         Event[]
@@ -26,17 +30,17 @@ model User {
 
 model Event {
   id               Int      @id @default(autoincrement())
-  uid              String   @unique @default(uuid(4)) // iCalendar UID - random per RFC 7986, never derived from id or host
+  uid              String   @unique @default(uuid(4)) @db.Uuid // iCalendar UID - random per RFC 7986, never derived from id or host
   title            String
   ownerId          Int      @map("owner_id")
-  startsAt         DateTime @map("starts_at")
-  endsAt           DateTime @map("ends_at")
+  startsAt         DateTime @map("starts_at") @db.Timestamptz(3)
+  endsAt           DateTime @map("ends_at") @db.Timestamptz(3)
   location         String?
   description      String?
   thumbnail        String? // file path of image e.g. ./public/event_images/example.jpg
   registrationLink String?  @map("registration_link")
   volunteerContact String?  @map("volunteer_contact")
-  createdAt        DateTime @default(now()) @map("created_at")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
 
   owner            User     @relation(fields: [ownerId], references: [id])
 

@@ -1,6 +1,6 @@
 {
   "_notes": {
-    "purpose": "Development-only seed data for the Rideau Community Hub prototype. Sourced from frontend/src/mocks/orgs.ts and frontend/src/mocks/events.ts.",
+    "purpose": "Development-only seed data for the Rideau Community Hub prototype.",
     "editing": "Flat arrays mirroring the Prisma models in prisma/schema.prisma. Cross-references use the explicit `id` fields below (users.organizationId -> organizations.id, events.ownerId -> users.id). Ids are only meaningful inside this file; the seed script is responsible for mapping them onto real autoincrement primary keys.",
     "passwords": "`devPassword` is plaintext and exists only so the seed script can hash it with argon2 before writing to users.password_hash. Each user is hashed separately, so users sharing a password still get distinct hashes (argon2 salts per call). Never ship this file to a non-development environment.",
     "datetimes": "ISO 8601 with an explicit UTC offset. Ottawa is -04:00 (EDT) until DST ends on 1 November 2026 and -05:00 (EST) after it, so both appear below. Events are dated relative to 2026-08-03: a couple in the past, the rest running about four months forward. GET /v1/events defaults startDate to now, so past events are excluded unless a window explicitly asks for them - which is why a few are kept here.",

@@ -1,12 +1,15 @@
 /**
- * Development-only seed for the SQLite dev database. AI generated and unreviewed.
+ * Development-only seed for the dev database. AI generated and unreviewed.
  *
  * Loads dev-organizations-seed.json, validates it, then wipes and repopulates
- * organizations, organizations_tags, users and events. Validation re-implements the
- * Postgres regex CHECKs SQLite cannot run, so a malformed fixture fails loudly.
+ * organizations, organizations_tags, users and events. Validation mirrors the
+ * database's CHECKs, so a malformed fixture is reported in full before anything is
+ * written rather than failing on the first rejected row.
  *
- * Fixture ids are inserted verbatim so seeded rows line up with the ids the
- * frontend mocks use; SQLite raises its AUTOINCREMENT high-water mark to match.
+ * Fixture ids are local cross-references only and are never written: the database
+ * assigns every primary key, and each fixture id is mapped to the row created for
+ * it. Writing explicit ids leaves Postgres' sequences behind, so the next insert
+ * from the API would collide with a seeded row.
  *
  * Usage (from backend/):
  *   npm run db:seed                 wipe and reseed
@@ -16,7 +19,7 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
+import { PrismaPg } from '@prisma/adapter-pg';
 
 import { PrismaClient } from '../../src/generated/prisma/client.js';
 import { EMAIL_RE, URL_RE } from '../../src/utils/constraints.js';
@@ -147,7 +150,7 @@ function validate(raw: unknown): string[] {
     if (typeof user.email !== 'string' || !EMAIL_RE.test(user.email)) {
       problems.push(`${at}: email ${JSON.stringify(user.email)} is not a valid email address`);
     } else {
-      // users.email is UNIQUE and SQLite compares case-sensitively, but two casings
+      // users.email is UNIQUE and Postgres compares case-sensitively, but two casings
       // of one address are the same account to any auth layer.
       const key = user.email.toLowerCase();
       if (emails.has(key)) problems.push(`${at}: duplicate email "${user.email}"`);
@@ -263,7 +266,7 @@ async function main() {
   // Not src/db/client.ts, which logs every query and would bury this output. A
   // one-shot process, so the single-client rule does not apply.
   const prisma = new PrismaClient({
-    adapter: new PrismaBetterSqlite3({ url: process.env.DATABASE_URL ?? 'file:./dev.db' }),
+    adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
     log: ['warn', 'error'],
   });
 
@@ -277,10 +280,10 @@ async function main() {
       await tx.user.deleteMany();
       await tx.organization.deleteMany();
 
+      const orgIds = new Map<number, number>();
       for (const org of organizations) {
-        await tx.organization.create({
+        const row = await tx.organization.create({
           data: {
-            id: org.id,
             name: org.name,
             logo: org.logo,
             blurb: org.blurb,
@@ -288,24 +291,29 @@ async function main() {
             website: org.website,
             tags: { create: org.tags.map((tag) => ({ tag })) },
           },
+          select: { id: true },
         });
+        orgIds.set(org.id, row.id);
       }
 
-      await tx.user.createMany({
-        data: users.map((user) => ({
-          id: user.id,
-          fullname: user.fullname,
-          email: user.email,
-          passwordHash: passwords.get(user.id)!,
-          organizationId: user.organizationId,
-        })),
-      });
+      const userIds = new Map<number, number>();
+      for (const user of users) {
+        const row = await tx.user.create({
+          data: {
+            fullname: user.fullname,
+            email: user.email,
+            passwordHash: passwords.get(user.id)!,
+            organizationId: orgIds.get(user.organizationId)!,
+          },
+          select: { id: true },
+        });
+        userIds.set(user.id, row.id);
+      }
 
       await tx.event.createMany({
         data: events.map((event) => ({
-          id: event.id,
           title: event.title,
-          ownerId: event.ownerId,
+          ownerId: userIds.get(event.ownerId)!,
           startsAt: new Date(event.startsAt),
           endsAt: new Date(event.endsAt),
           location: event.location,
