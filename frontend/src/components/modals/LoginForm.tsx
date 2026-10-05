@@ -27,7 +27,6 @@ type LoginFormProps = {
 
 export default function LoginForm({
   onClose,
-  onChangeMode,
 }: LoginFormProps) {
   // context
   const { toast } = useToast();

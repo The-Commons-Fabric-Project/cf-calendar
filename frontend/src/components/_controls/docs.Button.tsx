@@ -20,18 +20,18 @@ export const Default: Story = {
   },
 };
 
-export const Ghost: Story = {
+export const Secondary: Story = {
   args: {
-    "variant": "ghost",
-    "label": "You can't click me",
+    "variant": "secondary",
+    "label": "No, edit",
     "onClick": fn()
   }
 }
 
-export const Danger: Story = {
+export const Disabled: Story = {
   args: {
-    "variant": "danger",
-    "label": "Bad things will happen",
+    "variant": "disabled",
+    "label": "You can't click me",
     "onClick": fn()
   }
 }

@@ -200,7 +200,7 @@ export default function CreateEventModal({
             >Is this information correct?</p>
             <div className="flex gap-2.5"
             >
-              <Button variant="ghost" className="flex-1" onClick={() => setStep(1)}
+              <Button variant="secondary" className="flex-1" onClick={() => setStep(1)}
                 disabled={createEvent.isPending}>No, edit</Button>
               <Button className="flex-1" onClick={publish} disabled={createEvent.isPending}>
                 {createEvent.isPending ? "Publishing…" : "Yes, publish"}

@@ -98,7 +98,7 @@ export default function CreateAccountModal({ onClose }: CreateAccountModalProps)
             </div>
             <p className="text-sm font-semibold text-slate-900 mb-3.5">Is this information correct?</p>
             <div className="flex gap-2.5">
-              <Button variant="ghost" className="flex-1" onClick={() => setStep(1)}>No, edit</Button>
+              <Button variant="secondary" className="flex-1" onClick={() => setStep(1)}>No, edit</Button>
               <Button className="flex-1" onClick={handleCreate}>Yes, create</Button>
             </div>
           </>

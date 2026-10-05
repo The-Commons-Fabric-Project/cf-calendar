@@ -6,7 +6,6 @@ import Modal, { CloseButton } from './Modal';
 import Button from '../_controls/Button';
 import { useToast } from '../../hooks/useOverlayContext';
 import { accentStops, colorKey } from '../../utils/palette';
-import { useOrgLookup } from '../../hooks/useOrganizations';
 
 type DetailRowProps = {
   icon: ReturnType<typeof Icon>,

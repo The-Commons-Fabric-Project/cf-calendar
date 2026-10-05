@@ -54,12 +54,12 @@ frontend/                       — React SPA (Vite, TanStack Router/Query, Tail
 │   ├── mocks/                     — Mock data/backend, the peer of api/. Emptied out as flows wire up.
 │   ├── hooks/                     — useAuth (session context), useEvents, useOrganizations, useOverlayContext.
 │   ├── components/                — Grouped by Design System page (see components/README.md).
-│   │   ├── cards/                  — EventCard, OrgCard (+ Storybook docs.* variants).
-│   │   ├── chips/                  — DateChip, Summary, Tag.
-│   │   ├── controls/                — Button, Field, Toggle.
+│   │   ├── _chips/                 — DateChip, Summary, Tag (`_` prefix sorts primitives first).
+│   │   ├── _controls/               — Button, Field, Toggle.
+│   │   ├── cards/                  — EventCard, EventRow, OrgCard (+ Storybook docs.* variants).
 │   │   ├── modals/                  — CreateAccountModal, CreateEventModal, EventDetailModal, LoginForm/Modal, Modal, Toast.
-│   │   ├── nav/                     — FilterBar, Header (+ .stories.tsx).
-│   │   └── views/                   — Calendar, EventCardGrid.
+│   │   ├── nav/                     — FilterBar, FilterDropdown, Header, LegendBar (+ .stories.tsx).
+│   │   └── views/                   — Calendar, EventCardGrid, MonthGrid.
 │   ├── docs/                       — Storybook MDX pages (Foundations, Calendar, CardsAndContent, etc).
 │   ├── assets/                     — Logo/icon React components.
 │   └── utils/
