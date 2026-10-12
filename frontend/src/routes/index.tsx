@@ -1,6 +1,5 @@
 import { useState, useMemo } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { useAuth } from '../hooks/useAuth'
 
 import type { Org } from '../api/organizations';
 import type { Event } from '../api/events';
@@ -23,9 +22,10 @@ import { FilterDropdown } from '../components/nav/FilterDropdown';
 export const Route = createFileRoute('/')({
   component: Index,
   loader: async ({ context }) => {
-    const { queryClient: qc } = context;
+    const { queryClient: qc, auth } = context;
     const orgs = await qc.ensureQueryData(orgList()) as Org[];
-    return orgs;
+    const user = auth.user;
+    return { orgs, user };
   }
 })
 
@@ -41,13 +41,13 @@ function Index() {
     : { startDate: calendarWindow.start, endDate: calendarWindow.end };
 
   const { data: allEvents, isLoading, error } = useEvents(activeWindow);
-  const orgs = Route.useLoaderData();
+  const { orgs, user } = Route.useLoaderData();
 
   const [selectedOrgs, setSelectedOrgs] = useState<number[]>(orgs ? orgs.map(o => o.id) : []);  
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
   const orgName = useOrgLookup();
-  const { user } = useAuth();
+  // const { user } = useAuth();
   const { modal, setModal } = useModal();
   const { toast } = useToast();
 

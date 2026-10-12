@@ -16,6 +16,7 @@ import Summary from "../_chips/Summary";
 import { EMAIL_RE } from "../../utils/stringcheck";
 import { fmtTime, fmtPlainDate, fromDateAndTime, localDateTime } from "../../utils/datetime";
 import { useOrgLookup } from "../../hooks/useOrganizations";
+import { accentGradient } from "../../utils/palette";
 
 /**
  * What this form collects - deliberately not derived from `Event`. The form takes

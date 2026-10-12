@@ -1,3 +1,8 @@
+/**
+ * Component: Field
+ * 
+ * Text input w/ a label and error state
+ */
 import type { ReactNode } from "react";
 
 type FieldProps = {

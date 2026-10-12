@@ -43,11 +43,6 @@ function Directory() {
           </button>
           <Outlet/>
         </div>
-        //<ProfileView
-        //   org={activeOrg}
-        //   onBack={closeProfile}
-        //   onSelectEvent={setSelectedEvent}
-        // />*/}
       ) : (
         <>
           <h1>Organizations on the Hub</h1>
@@ -61,18 +56,12 @@ function Directory() {
               <div className="text-muted">Loading organizations…</div>
             ) : (
               (orgs ?? []).map((org, i) => (
-                // <Link 
-                //   to={`/directory/$orgId`} 
-                //   params={{ orgId: org.id.toString()}}
-                // >
                   <OrgCard key={org.id} org={org} idx={i} onClick={() => openProfile(org)} />
               ))
             )}
           </div>
         </>
       )}
-
-     
     </div>
   )
 }

@@ -57,14 +57,13 @@ export function CloseButton({ onClose }: {onClose: () => void}) {
 }
 
 export function ModalHeader({ title, onClose, subtitle, accent = "purple" }: ModalHeaderProps) {
-  const stops = accentStops(accent);
+  const stops = accentStops(accent)//.map(s => `bg-${s}`);
   return (
     <>
       {/* top edge decoration with gradient stops */}
       <div className='flex gap-0.5'>
         {stops.map((c, i) => (
-          <span key={i} className={`flex-1 h-0.75`}
-            style={{ background: `var(--color-${c})`}}
+          <span key={i} className={`flex-1 h-0.75 ${c}`}
           /> 
         ))}
       </div>
