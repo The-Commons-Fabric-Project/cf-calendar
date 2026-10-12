@@ -33,17 +33,18 @@ export default function Button({
   className,
   ...props
  }: ButtonProps) {
-  const baseClasses = "font-sans font-semibold text-sm py-2.25 px-4.5 rounded-md cursor-pointer leading-tight";
+  const baseClasses = "font-sans font-semibold text-sm py-2.25 px-4.5 rounded-md cursor-pointer leading-tight uppercase";
   const classes = `${baseClasses} ${VARIANT_MAPS[variant]} ${className || ''}`
-  const text = `${label ? label: ''}${typeof children === "string" ? children : ''}`.toString().toUpperCase();
+  const text = label ? label : children?.toString() as string;
   return (
     <button 
-      aria-label={label ? label : children?.toString() }
+      aria-label={text}
       onClick={onClick}
       className={`${classes} cf-press`}
       {...props}
     >
-      {typeof children === "string" ? text : children}
+      { label ? label :
+      (typeof children === "string") ? (text) : children }
     </button>
   );
 }
