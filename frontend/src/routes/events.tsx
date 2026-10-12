@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 
 import type { Org } from '../api/organizations';
 import type { Event } from '../api/events';
@@ -15,24 +15,31 @@ import CreateEventModal from '../components/modals/CreateEventModal';
 import EventDetailModal from '../components/modals/EventDetailModal';
 import { monthBounds, toDateKey } from '../utils/datetime';
 import type { DateKey } from '../utils/types/dates';
-import type { EventsView } from '../utils/types/views';
+import type { CalendarView as CalendarSpan, EventsView } from '../utils/types/views';
 import { FilterDropdown } from '../components/nav/FilterDropdown';
 
+type RouteSearchParams = {
+  view: EventsView,
+  span?: CalendarSpan,
+}
 
 export const Route = createFileRoute('/events')({
-  component: Index,
-  loader: async ({ context }) => {
+  component: Events,
+  validateSearch: (search) => search as RouteSearchParams,
+  loaderDeps: ({ search: { view }}) => ({ view }),
+  loader: async ({ context, deps: { view } }) => {
     const { queryClient: qc, auth } = context;
     // TODO: ensureQueryData will be deprecated in next version, replace with qc.query()
     const orgs = await qc.ensureQueryData(orgList()) as Org[];
     const user = auth.user;
-    return { orgs, user };
+    return { orgs, user, view };
   }
 })
 
 
-function Index() {
-  const [view, setView] = useState<EventsView>('calendar')
+function Events() {
+  const { orgs, user, view } = Route.useLoaderData();
+
   const [gridStart, setGridStart] = useState<DateKey>("");
   const [gridEnd, setGridEnd] = useState<DateKey>("");
   const [calendarWindow, setCalendarWindow] = useState(() => monthBounds(new Date()));
@@ -42,13 +49,11 @@ function Index() {
     : { startDate: calendarWindow.start, endDate: calendarWindow.end };
 
   const { data: allEvents, isLoading, error } = useEvents(activeWindow);
-  const { orgs, user } = Route.useLoaderData();
 
   const [selectedOrgs, setSelectedOrgs] = useState<number[]>(orgs ? orgs.map(o => o.id) : []);  
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
   const orgName = useOrgLookup();
-  // const { user } = useAuth();
   const { modal, setModal } = useModal();
   const { toast } = useToast();
 
@@ -59,6 +64,11 @@ function Index() {
     )},
     [allEvents, orgs, selectedOrgs]
   )
+
+  const navigate = useNavigate({from: Route.fullPath});
+  const setView = (view: EventsView) => {
+    navigate({ to: Route.fullPath, search: { view: view} });
+  }
 
 
   // TODO: add routes for individual events, follow https://www.notanumber.in/blog/render-modal-on-a-route-with-the-parent-in-background-in-tanstack-router

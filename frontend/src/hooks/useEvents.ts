@@ -28,7 +28,7 @@ function eventsQueryKey(query: EventQuery = {}) {
 export function useEvents(query: EventQuery = {}) {
   const key = eventsQueryKey(query);
 
-  console.log(`useEvents query: ${query}`);
+  console.log(`useEvents query: ${JSON.stringify(query)}`);
 
   return useQuery({
     queryKey: key,

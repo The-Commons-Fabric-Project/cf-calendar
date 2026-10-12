@@ -81,6 +81,7 @@ async function toApiError(response: Response): Promise<ApiError> {
  * if VITE_API_TARGET ever points elsewhere.
  */
 export async function request<T>(path: ApiRequestPath, init: RequestInit = {}): Promise<T> {
+  console.log(`API request: ${path}`);
   let response: Response;
   try {
     response = await fetch(`${BASE}${path}`, {
