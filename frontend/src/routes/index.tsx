@@ -21,8 +21,12 @@ import { FilterDropdown } from '../components/nav/FilterDropdown';
 
 export const Route = createFileRoute('/')({
   component: Index,
+  beforeLoad: () => {
+    throw Route.redirect({to: '/events'});
+  },
   loader: async ({ context }) => {
     const { queryClient: qc, auth } = context;
+    // TODO: ensureQueryData will be deprecated in next version, replace with qc.query()
     const orgs = await qc.ensureQueryData(orgList()) as Org[];
     const user = auth.user;
     return { orgs, user };

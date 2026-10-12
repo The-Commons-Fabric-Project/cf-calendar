@@ -68,7 +68,7 @@ export default function Header() {
 
         {/* Nav */}
         <nav className="flex gap-5.5 ml-auto mr-2">
-          <Link to="/" className={navClass(path === '/')}>Events</Link>
+          <Link to="/" className={navClass(path === '/events')}>Events</Link>
           <Link to="/directory" className={navClass(path === '/directory')}>Directory</Link>
           {/* TODO: about page */}
           {/* <Link to="/about" */}
