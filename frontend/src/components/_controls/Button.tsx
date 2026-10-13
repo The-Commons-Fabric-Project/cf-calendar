@@ -43,8 +43,7 @@ export default function Button({
       className={`${classes} cf-press`}
       {...props}
     >
-      { label ? label :
-      (typeof children === "string") ? (text) : children }
+    {children ? ((typeof children === "string") ? (text) : children) : text}
     </button>
   );
 }

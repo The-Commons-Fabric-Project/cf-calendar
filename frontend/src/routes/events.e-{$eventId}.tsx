@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/events/$eventId')({
+export const Route = createFileRoute('/events/e-{$eventId}')({
   component: RouteComponent,
 })
 

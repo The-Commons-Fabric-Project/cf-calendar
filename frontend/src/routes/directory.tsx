@@ -16,12 +16,12 @@ function Directory() {
   // Served from the query cache after the first route that asks for it, so
   // arriving here from the events page costs no request.
   const { data: orgs, isLoading, error } = useOrganizations()
-  const navigate = useNavigate({from: '/directory'});
+  const navigate = useNavigate({from: Route.fullPath});
 
   const openProfile = (org: Org) => {
     setActiveOrg(org);
     window.scrollTo(0, 0);
-    navigate({to: '/directory/$orgId', params: { orgId: org.id.toString()}})
+    navigate({to: '/directory/org-{$orgId}', params: { orgId: org.id.toString()}})
   }
 
   const closeProfile = () => {

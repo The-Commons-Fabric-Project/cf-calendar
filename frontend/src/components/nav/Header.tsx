@@ -9,6 +9,7 @@ import CreateAccountModal from '../modals/CreateAccountModal';
 
 import { COLOR_CLASSES, COLOR_ORDER } from '../../utils/palette'
 import Toast from '../modals/Toast';
+import type { RouterPath } from '../../utils/types/views';
 
 // ref: https://github.com/david4473/Reciped/blob/main/src/components/Header.tsx
 
@@ -21,15 +22,23 @@ import Toast from '../modals/Toast';
 export default function Header() {
   const session = useAuth();
   const { location, } = useRouterState();
-  const path = location.pathname;
   
   const { modal, setModal } = useModal();
   const {toastMsg} = useToast();
 
   const navClass = (active: boolean) =>
-    `no-underline border-b-2 cursor-pointer font-sans type-item px-0 pt-1 pb-1.5 bg-transparent transition-colors ${
+    `no-underline capitalize border-b-2 cursor-pointer font-sans type-item px-0 pt-1 pb-1.5 bg-transparent transition-colors ${
       active ? 'border-accent text-ink' : 'border-transparent text-muted'
     }`
+
+  const navLink = (link: RouterPath) => {
+    const path = location.pathname;
+    const display = link.split("/")[1];
+    return (
+      <Link to={link} className={navClass(path.includes(link))}>{display}</Link>
+    )
+  }
+
 
   const handleLogin = () => { setModal("login"); }
   // logout clears local state before awaiting the server, so the promise is unused.
@@ -68,10 +77,9 @@ export default function Header() {
 
         {/* Nav */}
         <nav className="flex gap-5.5 ml-auto mr-2">
-          <Link to="/" className={navClass(path === '/events')}>Events</Link>
-          <Link to="/directory" className={navClass(path === '/directory')}>Directory</Link>
-          {/* TODO: about page */}
-          {/* <Link to="/about" */}
+          {navLink('/events')}
+          {navLink('/directory')}
+          {navLink('/about')}
         </nav>
 
         {/* Auth buttons */}

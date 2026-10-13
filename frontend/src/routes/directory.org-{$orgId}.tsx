@@ -14,7 +14,7 @@ import Icon from '../assets/Icons'
 import { classesForID, colorKey } from '../utils/palette'
 import { orgInitials } from '../utils/stringcheck';
 
-export const Route = createFileRoute('/directory/$orgId')({
+export const Route = createFileRoute('/directory/org-{$orgId}')({
   loader: async ({ context, params }) => {
     // console.log(`running loader`);
     const { orgId } = params;

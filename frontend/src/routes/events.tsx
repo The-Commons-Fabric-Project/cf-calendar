@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useNavigate, Outlet } from '@tanstack/react-router'
 
 import type { Org } from '../api/organizations';
 import type { Event } from '../api/events';
@@ -10,13 +10,14 @@ import { useModal, useToast } from '../hooks/useOverlayContext';
 import Button from '../components/_controls/Button';
 import EventCardGrid from '../components/views/EventCardGrid'
 import { CalendarView } from '../components/views/Calendar'
+import FilterDropdown from '../components/nav/FilterDropdown';
 
 import CreateEventModal from '../components/modals/CreateEventModal';
 import EventDetailModal from '../components/modals/EventDetailModal';
 import { monthBounds, toDateKey } from '../utils/datetime';
 import type { DateKey } from '../utils/types/dates';
 import type { CalendarView as CalendarSpan, EventsView } from '../utils/types/views';
-import { FilterDropdown } from '../components/nav/FilterDropdown';
+import { useAuth } from '../hooks/useAuth';
 
 type RouteSearchParams = {
   view: EventsView,
@@ -28,24 +29,25 @@ export const Route = createFileRoute('/events')({
   validateSearch: (search) => search as RouteSearchParams,
   loaderDeps: ({ search: { view }}) => ({ view }),
   loader: async ({ context, deps: { view } }) => {
-    const { queryClient: qc, auth } = context;
+    const { queryClient: qc } = context;
     // TODO: ensureQueryData will be deprecated in next version, replace with qc.query()
     const orgs = await qc.ensureQueryData(orgList()) as Org[];
-    const user = auth.user;
-    return { orgs, user, view };
+    // const user = auth.user;
+    return { orgs, view };
   }
 })
 
 
 function Events() {
-  const { orgs, user, view } = Route.useLoaderData();
+  const { orgs, view } = Route.useLoaderData();
+  const { user } = useAuth();
 
   const [gridStart, setGridStart] = useState<DateKey>("");
   const [gridEnd, setGridEnd] = useState<DateKey>("");
   const [calendarWindow, setCalendarWindow] = useState(() => monthBounds(new Date()));
 
   const activeWindow = view === 'cards'
-    ? { startDate: gridStart, endDate: gridEnd }
+    ? ((gridStart === "" && gridEnd === "") ? undefined : {startDate: gridStart, endDate: gridEnd}) 
     : { startDate: calendarWindow.start, endDate: calendarWindow.end };
 
   const { data: allEvents, isLoading, error } = useEvents(activeWindow);
@@ -164,6 +166,7 @@ function Events() {
           }}
         />
       )}
+      <Outlet/>
     </div>
   )
 }
