@@ -1,0 +1,10 @@
+.git
+**/node_modules
+**/dist
+**/.env
+**/.env.*
+!**/.env.example
+backend/*.db
+backend/*.db-journal
+backend/src/generated
+frontend/storybook-static

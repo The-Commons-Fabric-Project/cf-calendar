@@ -7,22 +7,13 @@ import { organizationsRouter } from './endpoints/organizations.js';
 import { authRouter } from './endpoints/auth.js';
 import { calendarRouter } from './endpoints/calendar.js';
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 
-/**
- * App factory for initializing middleware, setting CORS policy and establishing routes.
- *
- * Registration order is load-bearing:
- *
- *   1. body parsing and logging, which everything downstream depends on
- *   2. routers, so a real endpoint always wins over the SPA fallback
- *   3. the production static and catch-all handlers, which answer whatever is left
- *   4. the error handler, which must be last to see errors from all of the above
- *
- * With the catch-all above the routers, every production GET is answered with
- * index.html before a router sees it.
- */
+// ES modules have no __dirname; resolves to dist/ at runtime.
+const moduleDir = path.dirname(fileURLToPath(import.meta.url));
+
 export function createApp() {
   const app = express();
   const isDevelopment = process.env.NODE_ENV === 'development';
@@ -53,9 +44,9 @@ export function createApp() {
 
   if (!isDevelopment) {
     // Serves the built vite project. After the routers, so a real route wins.
-    app.use(express.static(path.join(__dirname, '../../frontend/dist')));
+    app.use(express.static(path.join(moduleDir, '../../frontend/dist')));
     app.get('/{*splat}', (_req, res) => {
-      res.sendFile(path.join(__dirname, '../../frontend/dist/index.html'));
+      res.sendFile(path.join(moduleDir, '../../frontend/dist/index.html'));
     });
   }
 

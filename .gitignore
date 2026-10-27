@@ -26,3 +26,6 @@ package-lock.json
 coverage
 eslint-report.*
 *ESLINT_OUTPUT.html
+
+# Deploy target config (see deploy/deploy.conf.example)
+deploy/deploy.conf

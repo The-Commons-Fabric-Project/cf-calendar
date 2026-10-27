@@ -1,0 +1,15 @@
+# Copy to deploy/deploy.conf (gitignored) and fill in. Sourced by deploy.sh.
+
+# SSH destination as user@host; the host can be a domain name or an IP address.
+DEPLOY_TARGET="deploy@events.example.org"
+DEPLOY_SSH_PORT=22
+
+# Directory on the server holding docker-compose.yml and .env. Relative paths are
+# resolved from the SSH user's home directory.
+DEPLOY_DIR="commons-fabric"
+
+# The server's CPU architecture: linux/amd64 for x86 servers, linux/arm64 for ARM.
+DEPLOY_PLATFORM="linux/amd64"
+
+# Older images kept on the server for rollback, besides the one running.
+DEPLOY_KEEP_IMAGES=3

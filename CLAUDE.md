@@ -75,6 +75,15 @@ packages/                       — Internal-only shared workspace packages (nev
 └── typescript-config/             — @prototype/typescript-config: shared tsconfig presets (base/node/vite).
 
 .devcontainer/                  — Dev container config (devcontainer.json, docker-compose.yml).
+deploy/                         — Production deploy over SSH; see deploy/README.md.
+├── deploy.sh                    — Builds the image locally, uploads it, restarts the stack on the server.
+├── deploy.conf.example          — Template for deploy.conf (gitignored): SSH target, server dir, platform.
+├── docker-compose.prod.yml      — Server stack, copied there as docker-compose.yml on each deploy.
+└── server.env.example           — Template for the server's .env (Postgres password, session secret).
+docker-compose.yml              — Postgres for local dev; the `app` profile adds the production container.
+Dockerfile                      — Production image: backend serving the built frontend; migrates on start.
+.dockerignore                   — Keeps node_modules, dist, .env files and generated output out of the build.
+.env.example                    — Template for the root .env that docker-compose.yml reads.
 .github/dependabot.yml          — Dependency update automation config.
 .claude/skills/project-audit/   — Project-audit skill definition used by this repo's Claude Code setup.
 eslint.config.mjs               — Root flat config re-exporting @prototype/eslint-config for editor resolution
@@ -135,6 +144,9 @@ not what); one-liners or obvious functionality do not need one.
 
 ### Commands
 
+- `docker compose up -d` (root) — starts Postgres for local development.
+  `docker compose --profile app up --build` also runs the production app on :3000
+  (needs `SESSION_SECRET` in the root `.env`).
 - `npm run dev` (root) — runs frontend and backend dev servers concurrently.
 - `npm run db:migrate` (backend) — apply/create Prisma migrations against the local
   SQLite dev DB; re-run after pulling new migrations. `npm run db:deploy` applies

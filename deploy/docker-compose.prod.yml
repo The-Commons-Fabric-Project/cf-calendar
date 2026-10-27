@@ -1,0 +1,56 @@
+# Production stack, copied to the server as docker-compose.yml by deploy.sh.
+# The app image is loaded by deploy.sh rather than pulled; secrets come from the
+# .env beside it on the server (see server.env.example).
+#
+# Memory limits are sized for a 1 GB host: the app peaks near 200 MiB while
+# migrating on start, and runs at roughly 100 MiB.
+name: commons-fabric
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-commons}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-commons_fabric}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    mem_limit: 256m
+    logging: *logging
+
+  app:
+    image: commons-fabric:latest
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-commons}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-commons_fabric}
+      SESSION_SECRET: ${SESSION_SECRET:?set SESSION_SECRET in .env}
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/v1/organizations').then(r => process.exit(r.ok ? 0 : 1), () => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+    mem_limit: 512m
+    logging: *logging
+
+volumes:
+  pgdata:
