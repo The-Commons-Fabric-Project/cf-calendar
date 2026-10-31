@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { createFileRoute, Outlet, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, Outlet, useChildMatches, useNavigate } from '@tanstack/react-router'
 
 import type { Org } from '../api/organizations'
 import { useOrganizations } from '../hooks/useOrganizations'
@@ -11,28 +10,23 @@ export const Route = createFileRoute('/directory')({
 })
 
 function Directory() {
-  const [activeOrg, setActiveOrg] = useState<Org | null>(null)
-
-  // Served from the query cache after the first route that asks for it, so
-  // arriving here from the events page costs no request.
+  const showingProfile = useChildMatches().length > 0
   const { data: orgs, isLoading, error } = useOrganizations()
   const navigate = useNavigate({from: Route.fullPath});
 
   const openProfile = (org: Org) => {
-    setActiveOrg(org);
     window.scrollTo(0, 0);
     navigate({to: '/directory/org-{$orgId}', params: { orgId: org.id.toString()}})
   }
 
   const closeProfile = () => {
-    setActiveOrg(null);
     window.scrollTo(0, 0);
     navigate({to: '/directory'});
   }
 
   return (
     <div className="w-260 pt-9 px-6 pb-20">
-      {activeOrg ? (
+      {showingProfile ? (
         <div style={{ animation: 'cf-fade .3s ease' }}>
           <button
             className="bg-transparent border-0 text-primary font-semibold text-[14px] cursor-pointer p-0 mb-4.5 block font-body"
