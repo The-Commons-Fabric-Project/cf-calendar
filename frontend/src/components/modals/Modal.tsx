@@ -32,7 +32,8 @@ export default function Modal({
     >
       <div
         role="dialog" aria-modal="true"
-        className={`w-[${width}px] max-w-[${width}px] max-h-[88vh] overflow-y-auto bg-white rounded-lg border border-ink animate-pop`}
+        className="max-w-full max-h-[88vh] overflow-y-auto bg-white rounded-lg border border-ink animate-pop"
+        style={{ width }}
       >
         <ModalHeader title={title} subtitle={subtitle} onClose={onClose} accent={accent}/>
         {children}
@@ -57,7 +58,7 @@ export function CloseButton({ onClose }: {onClose: () => void}) {
 }
 
 export function ModalHeader({ title, onClose, subtitle, accent = "purple" }: ModalHeaderProps) {
-  const stops = accentStops(accent)//.map(s => `bg-${s}`);
+  const stops = accentStops(accent);
   return (
     <>
       {/* top edge decoration with gradient stops */}

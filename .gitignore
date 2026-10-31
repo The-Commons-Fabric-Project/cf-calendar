@@ -29,3 +29,4 @@ eslint-report.*
 
 # Deploy target config (see deploy/deploy.conf.example)
 deploy/deploy.conf
+.playwright-mcp
