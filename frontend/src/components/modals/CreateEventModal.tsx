@@ -16,13 +16,7 @@ import Summary from "../_chips/Summary";
 import { EMAIL_RE } from "../../utils/stringcheck";
 import { fmtTime, fmtPlainDate, fromDateAndTime, localDateTime } from "../../utils/datetime";
 import { useOrgLookup } from "../../hooks/useOrganizations";
-import { accentGradient } from "../../utils/palette";
 
-/**
- * What this form collects - deliberately not derived from `Event`. The form takes
- * separate startDate and startTime inputs and registration toggles; the API takes one
- * `startsAt` and infers registration from the link. The submit handler converts.
- */
 type EventStringFields = {
   /**
    * title: string;
@@ -53,7 +47,7 @@ type CreateEventModalProps = {
   onClose: () => void,
   session: User,
   /** Called with the published event once the server has accepted it. */
-  onCreate: (event: Event) => void,
+  onCreate?: (event: Event) => void,
 }
 
 export default function CreateEventModal({ 
@@ -95,7 +89,7 @@ export default function CreateEventModal({
       },
       {
         onSuccess: (created) => {
-          onCreate(created);
+          onCreate?.(created);
           toast("Event created and confirmed.");
           onClose();
         },
