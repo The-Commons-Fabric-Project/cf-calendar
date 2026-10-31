@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/tanstack-react';
 
-import { Route } from '../routes/index';
+import { Route } from '../routes';
 
 // ref: https://storybook.js.org/docs/get-started/frameworks/tanstack-react#rendering-a-route
 const meta = {

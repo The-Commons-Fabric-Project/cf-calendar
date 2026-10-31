@@ -85,12 +85,12 @@ export function accentGradient(color: ColorVariantKey | number = "purple"): stri
   return `bg-linear-135 from-${c}-c1 to-${c}-c2`
 }
 
-export function accentStops(color: ColorVariantKey | number): ColorVariable[] {
+export function accentStops(color: ColorVariantKey | number): `bg-${ColorVariable}`[] {
   const c = (typeof color === "number") ? colorKey(color) : color;
   return [
-    `${c}-c1`,
-    `${c}-stop2`,
-    `${c}-stop3`,
-    `${c}-c2`
+    `bg-${c}-c1`,
+    `bg-${c}-stop2`,
+    `bg-${c}-stop3`,
+    `bg-${c}-c2`
   ]
 }

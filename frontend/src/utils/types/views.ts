@@ -1,3 +1,7 @@
+import type { FileRoutesByFullPath } from "../../routeTree.gen";
+
+export type RouterPath = keyof FileRoutesByFullPath;
+
 export type EventsView = "cards" | "calendar";
 export type CalendarView = "day" | "week" | "month";
 

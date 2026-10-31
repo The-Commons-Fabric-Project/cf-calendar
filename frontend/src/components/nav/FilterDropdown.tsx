@@ -17,7 +17,7 @@ interface FilterDropdownProps {
   onApply: (ids: number[]) => void;
 }
 
-export function FilterDropdown({ orgs, appliedIds, onApply }: FilterDropdownProps) {
+export default function FilterDropdown({ orgs, appliedIds, onApply }: FilterDropdownProps) {
   const [open, setOpen] = useState(false);
   const [pending, setPending] = useState<number[]>(orgs ? orgs.map(o=>o.id) : []);
 

@@ -16,12 +16,12 @@ function Directory() {
   // Served from the query cache after the first route that asks for it, so
   // arriving here from the events page costs no request.
   const { data: orgs, isLoading, error } = useOrganizations()
-  const navigate = useNavigate({from: '/directory'});
+  const navigate = useNavigate({from: Route.fullPath});
 
   const openProfile = (org: Org) => {
     setActiveOrg(org);
     window.scrollTo(0, 0);
-    navigate({to: '/directory/$orgId', params: { orgId: org.id.toString()}})
+    navigate({to: '/directory/org-{$orgId}', params: { orgId: org.id.toString()}})
   }
 
   const closeProfile = () => {
@@ -43,11 +43,6 @@ function Directory() {
           </button>
           <Outlet/>
         </div>
-        //<ProfileView
-        //   org={activeOrg}
-        //   onBack={closeProfile}
-        //   onSelectEvent={setSelectedEvent}
-        // />*/}
       ) : (
         <>
           <h1>Organizations on the Hub</h1>
@@ -61,18 +56,12 @@ function Directory() {
               <div className="text-muted">Loading organizations…</div>
             ) : (
               (orgs ?? []).map((org, i) => (
-                // <Link 
-                //   to={`/directory/$orgId`} 
-                //   params={{ orgId: org.id.toString()}}
-                // >
                   <OrgCard key={org.id} org={org} idx={i} onClick={() => openProfile(org)} />
               ))
             )}
           </div>
         </>
       )}
-
-     
     </div>
   )
 }
