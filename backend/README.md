@@ -1,4 +1,4 @@
-# Commons Fabric prototype: Back End
+# Commons Fabric Calendar: Back End
 
 ## Setup
 
@@ -30,7 +30,7 @@
    npm run db:migrate
    ```
 
-   This applies all migrations in `prisma/migrations` to a local SQLite database (creating a `dev.db` file if it doesn't already exist) and regenerates the Prisma client. Re-run this command whenever you pull new migrations.
+   This applies all migrations in `prisma/migrations` to a PostgresSQL database (creating a `dev.db` file if it doesn't already exist) and regenerates the Prisma client. Re-run this command whenever you pull new migrations.
 
 5. Generate the Prisma client:
 
