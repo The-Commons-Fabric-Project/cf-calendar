@@ -114,7 +114,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    [path: `/events/${string}`]: {
+    "/events/{eventId}": {
         parameters: {
             query?: never;
             header?: never;
@@ -125,6 +125,50 @@ export interface paths {
         };
         /** Get a single event */
         get: operations["getEvent"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/events/{eventId}/calendar.ics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eventId: components["parameters"]["EventId"];
+            };
+            cookie?: never;
+        };
+        /**
+         * Download a single event as iCalendar
+         * @description The event as an RFC 5545 `VCALENDAR` holding one `VEVENT`, served as an attachment for "add to calendar". Its `UID` is the same one the subscription feed uses, so importing it and subscribing do not double up in clients that de-duplicate on `UID`.
+         */
+        get: operations["getEventCalendar"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/calendar.ics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Subscribe to events as an iCalendar feed
+         * @description A subscribable `VCALENDAR` of every event that ended within the last 30 days or has yet to end, optionally narrowed to one organization. The lookback keeps an event in subscribers' calendars while it is running and after it has passed; the window is fixed rather than a parameter, because a subscription URL is polled unattended.
+         *
+         *     Answers 404 when `organizationId` names no organization, so a mistyped subscription fails loudly instead of syncing an empty calendar forever.
+         */
+        get: operations["getCalendarFeed"];
         put?: never;
         post?: never;
         delete?: never;
@@ -153,7 +197,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    [path: `/organizations/${string}`]: {
+    "/organizations/{organizationId}": {
         parameters: {
             query?: never;
             header?: never;
@@ -176,10 +220,15 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        /** Format: date-time */
+        /**
+         * Format: date-time
+         * @description Format includes timezone offset from UTC: `2026-06-16T10:00:00-04:00`
+         */
         Timestamp: string;
         /** @description Identifier of an organization (an `organizations` row). */
         OrganizationId: number;
+        /** @description An RFC 5545 `VCALENDAR` with no `METHOD` - a snapshot, not a scheduling message. Times are UTC. Each `VEVENT`'s `UID` is a random v4 UUID (RFC 7986 section 5.3) stored with the event and fixed for its lifetime; it is unrelated to the event's `id`. */
+        ICalendar: string;
         /** @description Identifier of a user. */
         UserId: number;
         /** @description Identifier of an event. */
@@ -353,10 +402,12 @@ export interface components {
         StartDate: components["schemas"]["Timestamp"];
         /** @description End of the time window. Unbounded when omitted. Must be later than `startDate`. */
         EndDate: components["schemas"]["Timestamp"];
-        /** @description Only return events published under this organization. */
-        OrganizationIdFilter: components["schemas"]["OrganizationId"];
         EventId: components["schemas"]["EventId"];
         OrganizationId: components["schemas"]["OrganizationId"];
+        /** @description Only return events published under this organization. */
+        OrganizationIdFilter: components["schemas"]["OrganizationId"];
+        /** @description Only return events published by one of the selected organizations (array of org IDs). */
+        OrganizationIdFiltersSelection: components["schemas"]["OrganizationId"][];
     };
     requestBodies: never;
     headers: never;
@@ -483,6 +534,8 @@ export interface operations {
                 endDate?: components["parameters"]["EndDate"];
                 /** @description Only return events published under this organization. */
                 organizationId?: components["parameters"]["OrganizationIdFilter"];
+                /** @description Only return events published by one of the selected organizations (array of org IDs). */
+                selectedIds?: components["parameters"]["OrganizationIdFiltersSelection"];
             };
             header?: never;
             path?: never;
@@ -551,6 +604,59 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Event"];
+                };
+            };
+            400: components["responses"]["ValidationError"];
+            404: components["responses"]["Problem"];
+            default: components["responses"]["Problem"];
+        };
+    };
+    getEventCalendar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eventId: components["parameters"]["EventId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The event as an iCalendar file */
+            200: {
+                headers: {
+                    /** @description `attachment`, with a filename derived from the title. */
+                    "Content-Disposition"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/calendar": components["schemas"]["ICalendar"];
+                };
+            };
+            400: components["responses"]["ValidationError"];
+            404: components["responses"]["Problem"];
+            default: components["responses"]["Problem"];
+        };
+    };
+    getCalendarFeed: {
+        parameters: {
+            query?: {
+                /** @description Only return events published under this organization. */
+                organizationId?: components["parameters"]["OrganizationIdFilter"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The feed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/calendar": components["schemas"]["ICalendar"];
                 };
             };
             400: components["responses"]["ValidationError"];

@@ -45,6 +45,7 @@ export type EventQuery = {
   startDate?: DateKey;
   endDate?: DateKey;
   organizationId?: number;
+  selectedIds?: number[];
 };
 
 function queryString(query: EventQuery = {}): QueryString | '' {
@@ -52,6 +53,11 @@ function queryString(query: EventQuery = {}): QueryString | '' {
   if (query.startDate) params.set('startDate', dayEdge(query.startDate, 'start'));
   if (query.endDate) params.set('endDate', dayEdge(query.endDate, 'end'));
   if (query.organizationId !== undefined) params.set('organizationId', String(query.organizationId));
+  if (query.selectedIds !== undefined) {
+    const ids = query.selectedIds;
+    if (ids.length) 
+    params.set('selectedIds', ids.sort().join(','))
+  }
 
   const search = params.toString();
   return search ? `?${search}` : '';

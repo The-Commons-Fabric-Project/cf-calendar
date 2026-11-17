@@ -1,5 +1,5 @@
 /**
- * Events for a time window, refetched whenever that window changes.
+ * Querying events for a time window, refetched whenever that window changes.
  *
  * The window is part of the query key, so a response arriving after the user has
  * paged on belongs to a key that is no longer rendered and cannot overwrite the
@@ -14,7 +14,7 @@ import { createEvent, listEvents, type EventCreate, type EventQuery } from '../a
  * The key for a window. Empty strings from the date inputs are normalised away, so
  * "" and undefined do not produce two cache entries for one window.
  */
-function eventsQueryKey(query: EventQuery = {}) {
+export function eventsQueryKey(query: EventQuery = {}) {
   return [
     'events',
     {

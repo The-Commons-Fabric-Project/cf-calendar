@@ -180,6 +180,7 @@ paths:
         - $ref: '#/components/parameters/StartDate'
         - $ref: '#/components/parameters/EndDate'
         - $ref: '#/components/parameters/OrganizationIdFilter'
+        - $ref: '#/components/parameters/OrganizationIdFiltersSelection'
       responses:
         '200':
           description: A list of events
@@ -391,12 +392,6 @@ components:
       description: End of the time window. Unbounded when omitted. Must be later than `startDate`.
       schema: { $ref: '#/components/schemas/Timestamp' }
 
-    OrganizationIdFilter:
-      name: organizationId
-      in: query
-      description: Only return events published under this organization.
-      schema: { $ref: '#/components/schemas/OrganizationId' }
-
     EventId:
       name: eventId
       in: path
@@ -408,6 +403,18 @@ components:
       in: path
       required: true
       schema: { $ref: '#/components/schemas/OrganizationId' }
+
+    OrganizationIdFilter:
+      name: organizationId
+      in: query
+      description: Only return events published under this organization.
+      schema: { $ref: '#/components/schemas/OrganizationId' }
+
+    OrganizationIdFiltersSelection:
+      name: selectedIds
+      in: query
+      description: Only return events published by one of the selected organizations (array of org IDs).
+      schema: { type: array, items: {$ref: '#/components/schemas/OrganizationId' }}
 
   schemas:
     Timestamp:

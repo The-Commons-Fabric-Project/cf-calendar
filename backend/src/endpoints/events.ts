@@ -41,10 +41,11 @@ const withOwnerOrganization = { owner: { select: { organizationId: true } } } as
  */
 eventsRouter.get('/events', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { startDate, endDate, organizationId } = req.query as {
+    const { startDate, endDate, organizationId, selectedIds } = req.query as {
       startDate?: string;
       endDate?: string;
       organizationId?: number;
+      selectedIds?: number[];
     };
 
     const start = startDate ? new Date(startDate) : new Date();
@@ -54,11 +55,14 @@ eventsRouter.get('/events', async (req: Request, res: Response, next: NextFuncti
       throw badRequest('endDate must be later than startDate.', '/query/endDate');
     }
 
+    const orgs = (selectedIds !== undefined && selectedIds.length > 0) ? selectedIds : undefined;
+
     const rows = await prisma.event.findMany({
       where: {
         endsAt: { gte: start },
         ...(end ? { startsAt: { lte: end } } : {}),
         ...(organizationId !== undefined ? { owner: { organizationId } } : {}),
+        ...(orgs ? { owner: { organizationId: { in: orgs}}} : {})
       },
       orderBy: { startsAt: 'asc' },
       include: withOwnerOrganization,
